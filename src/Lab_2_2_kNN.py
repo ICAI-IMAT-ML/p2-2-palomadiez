@@ -51,6 +51,12 @@ class knn:
             p (int, optional): The degree of the Minkowski distance. Defaults to 2.
         """
         # TODO
+        if k<=0:
+            print("Error: k has to be a positive integer.")
+        if p<=0:
+            print("Error: p has to be a possitive integer.")
+        if X_train.shape[0] != y_train.shape[0]:
+            print("Error: x and y have to have the same number of rows.")
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """
