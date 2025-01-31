@@ -95,6 +95,23 @@ class knn:
             np.ndarray: Predicted class probabilities.
         """
         # TODO
+        predicted_prob = []
+        for sample in X:
+            yes = 0
+            no = 0
+            distances = self.compute_distances(sample)
+            indices = self.get_k_nearest_neighbors(distances)
+            for i in indices:
+                cat = self.y_train[i]
+                if cat == 'YES':
+                    yes+=1
+                else:
+                    no+=1
+
+            predicted_prob.append(np.array([no/self.k,yes/self.k]))
+        
+        return np.array(predicted_prob)
+
 
     def compute_distances(self, point: np.ndarray) -> np.ndarray:
         """Compute distance from a point to every point in the training dataset
