@@ -414,8 +414,8 @@ def plot_roc_curve(y_true, y_probs, positive_label):
     probs_orden = y_probs[indices]
     true_orden = y_true[indices]
 
-    tpr = [0]  # Ratio de verdaderos positivos
-    fpr = [0]  # Ratio falsos positivos
+    tpr = []  # Ratio de verdaderos positivos
+    fpr = []  # Ratio falsos positivos
     P = sum(true_orden == positive_label)
     N = sum(true_orden != positive_label)
 
