@@ -362,7 +362,24 @@ def plot_probability_histograms(y_true, y_probs, positive_label, n_bins=10):
 
     """
     # TODO
-    
+    y_true_mapped = np.array([1 if label == positive_label else 0 for label in y_true])
+    probs_1 = y_probs[y_true == positive_label]
+    probs_0 = y_probs[y_true != positive_label]
+
+    ig, ax = plt.subplots(1, 2, figsize=(12, 5))
+
+    ax[0].hist(probs_1, bins=n_bins, color='purple', alpha=0.7)
+    ax[0].set_title('Clase positiva')
+    ax[0].set_xlabel('Probabilidad')
+    ax[0].set_ylabel('Frecuencia')
+
+    ax[1].hist(probs_0, bins=n_bins, color='orange', alpha=0.7)
+    ax[1].set_title('Clase negativa')
+    ax[1].set_xlabel('Probabilidad')
+    ax[1].set_ylabel('Frecuencia')
+
+    plt.tight_layout()
+    plt.show()
 
     return {
         "array_passed_to_histogram_of_positive_class": y_probs[y_true_mapped == 1],
