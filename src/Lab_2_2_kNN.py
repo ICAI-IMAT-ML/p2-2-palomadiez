@@ -77,10 +77,7 @@ class knn:
             distances = self.compute_distances(sample)
             indices = self.get_k_nearest_neighbors(distances) 
             label = self.most_common_label(indices)    
-            if label == 1:
-                predicted.append('YES')
-            else:
-                predicted.append('NO')
+            predicted.append(label)
         
         return np.array(predicted)
 
@@ -140,9 +137,12 @@ class knn:
         # TODO
         labels = {0:0, 1:0}
         for label in knn_labels:
-            labels[label]+=1
-
-        most_common = max(labels)  
+            if self.y_train[label]==1:
+                labels[1]+=1
+            else:
+                labels[0]+=1
+        
+        most_common = max(labels, key=labels.get)  
         return most_common
 
     def __str__(self):
