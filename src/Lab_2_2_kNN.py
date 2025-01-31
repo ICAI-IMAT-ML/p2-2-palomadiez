@@ -71,7 +71,6 @@ class knn:
         Returns:
             np.ndarray: Predicted class labels.
         """
-        # TODO
         predicted = []
         for sample in X:
             distances = self.compute_distances(sample)
@@ -94,21 +93,20 @@ class knn:
         Returns:
             np.ndarray: Predicted class probabilities.
         """
-        # TODO
         predicted_prob = []
-        for sample in X:
-            yes = 0
-            no = 0
-            distances = self.compute_distances(sample)
+        for x in X:
+            pos = 0
+            neg = 0
+            distances = self.compute_distances(x)
             indices = self.get_k_nearest_neighbors(distances)
             for i in indices:
                 cat = self.y_train[i]
-                if cat == 'YES':
-                    yes+=1
+                if cat == 1:
+                    pos+=1
                 else:
-                    no+=1
+                    neg+=1
 
-            predicted_prob.append(np.array([no/self.k,yes/self.k]))
+            predicted_prob.append(np.array([neg/self.k,pos/self.k]))
         
         return np.array(predicted_prob)
 
@@ -151,7 +149,6 @@ class knn:
         Returns:
             int: most common label
         """
-        # TODO
         labels = {0:0, 1:0}
         for label in knn_labels:
             if self.y_train[label]==1:
@@ -280,19 +277,26 @@ def evaluate_classification_metrics(y_true, y_pred, positive_label):
         elif y_true_mapped[i]==1 and y_pred_mapped[i]==0:
             fn+=1
 
-    # Accuracy
-    accuracy = (tp+tn)/(tp+tn+fp+fn)
-    # Precision
-    precision = tp/(tp+fp)
+    if tp == 0 and tn==0:
+        accuracy = 0
+        precision = 0
+        recall = 0
+        specificity = 0
+        f1 = 0
+    else:
+        # Accuracy
+        accuracy = (tp+tn)/(tp+tn+fp+fn)
+        # Precision
+        precision = tp/(tp+fp)
 
-    # Recall (Sensitivity)
-    recall = tp/(tp+fn)
+        # Recall (Sensitivity)
+        recall = tp/(tp+fn)
 
-    # Specificity
-    specificity = tn/(tn+fp)
+        # Specificity
+        specificity = tn/(tn+fp)
 
-    # F1 Score
-    f1 = (2*precision*recall)/(precision+recall)
+        # F1 Score
+        f1 = (2*precision*recall)/(precision+recall)
 
     return {
         "Confusion Matrix": [tn, fp, fn, tp],
