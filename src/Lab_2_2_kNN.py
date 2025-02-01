@@ -330,10 +330,39 @@ def plot_calibration_curve(y_true, y_probs, positive_label, n_bins=10):
             - "true_proportions": Array of the fraction of positives in each bin
 
     """
-    # TODO
-    
-    return {"bin_centers": bin_centers, "true_proportions": true_proportions}
+    y_true = np.array(y_true)
+    y_probs = np.array(y_probs)
 
+    bin_edges = np.linspace(0, 1, n_bins + 1)
+    bin_centers = (bin_edges[:-1] + bin_edges[1:])/2 
+
+    true_proportions = []
+
+    for i in range(n_bins):
+        in_bin = (y_probs >= bin_edges[i]) & (y_probs < bin_edges[i + 1])
+        
+        if np.any(in_bin):
+            true_proportion = np.mean(y_true[in_bin] == positive_label)
+        else:
+            true_proportion = np.nan
+        
+        true_proportions.append(true_proportion)
+
+    true_proportions = np.array(true_proportions)
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(bin_centers, true_proportions, marker="o", linestyle="-", color="blue", label="Modelo")
+    plt.plot([0, 1], [0, 1], linestyle="--", color="gray", label="Perfectamente Calibrado")  # Línea ideal
+    plt.xlim(0, 1)
+    plt.ylim(0, 1)
+    plt.xlabel("Probabilidad Predicha")
+    plt.ylabel("Proporción Real de Positivos")
+    plt.title("Curva de Calibración")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+    return {"bin_centers": bin_centers, "true_proportions": true_proportions}
 
 
 def plot_probability_histograms(y_true, y_probs, positive_label, n_bins=10):
@@ -361,7 +390,6 @@ def plot_probability_histograms(y_true, y_probs, positive_label, n_bins=10):
                 Array of predicted probabilities for the negative class.
 
     """
-    # TODO
     y_true_mapped = np.array([1 if label == positive_label else 0 for label in y_true])
     probs_1 = y_probs[y_true == positive_label]
     probs_0 = y_probs[y_true != positive_label]
@@ -410,34 +438,39 @@ def plot_roc_curve(y_true, y_probs, positive_label):
 
     """
     # TODO
-    indices = np.argsort(y_probs)[::-1]
-    probs_orden = y_probs[indices]
-    true_orden = y_true[indices]
-
-    tpr = []  # Ratio de verdaderos positivos
-    fpr = []  # Ratio falsos positivos
-    P = sum(true_orden == positive_label)
-    N = sum(true_orden != positive_label)
-
-    TP = 0  # Verdaderos positivos
-    FP = 0  # Falsos positivos
-
-    for i in range(len(probs_orden)):
-        if true_orden[i] == positive_label:
-            TP += 1
-        else:
-            FP += 1
-        tpr.append(TP / P)
-        fpr.append(FP / N)
-
-    tpr.append(1)
-    fpr.append(1)
-
-    plt.figure(figsize=(8, 6))
-    plt.plot(fpr, tpr, color='orange', lw=2)
-    plt.plot([0, 1], [0, 1], color='gray', linestyle='--')
-    plt.xlabel('Ratio Falsos Positivos')
-    plt.ylabel('Ratio Verdaderos Positivos')
-    plt.title('Curva ROC')
+    # Convert y_true to binary (1 for positive_label, 0 otherwise)
+    y_true = np.array([1 if label == positive_label else 0 for label in y_true])
+    
+    # Sort by predicted probabilities in descending order
+    thresholds = np.sort(np.unique(y_probs))[::-1]
+    
+    tpr = []
+    fpr = []
+    
+    for threshold in thresholds:
+        y_pred = (y_probs >= threshold).astype(int)
+        
+        tp = np.sum((y_pred == 1) & (y_true == 1))
+        fp = np.sum((y_pred == 1) & (y_true == 0))
+        tn = np.sum((y_pred == 0) & (y_true == 0))
+        fn = np.sum((y_pred == 0) & (y_true == 1))
+        
+        tpr.append(tp / (tp + fn) if (tp + fn) > 0 else 0)
+        fpr.append(fp / (fp + tn) if (fp + tn) > 0 else 0)
+    
+    # Append (0,0) and (1,1) to ensure proper curve
+    fpr = np.array([0] + fpr + [1])
+    tpr = np.array([0] + tpr + [1])
+    
+    # Plot ROC curve
+    plt.figure(figsize=(6, 6))
+    plt.plot(fpr, tpr, marker='o', linestyle='-', color='b', label='ROC Curve')
+    plt.plot([0, 1], [0, 1], linestyle='--', color='gray', label='Random Classifier')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve')
+    plt.legend()
+    plt.grid()
     plt.show()
+  
     return {"fpr": np.array(fpr), "tpr": np.array(tpr)}
