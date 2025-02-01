@@ -464,7 +464,7 @@ def plot_roc_curve(y_true, y_probs, positive_label):
     
     # Plot ROC curve
     plt.figure(figsize=(6, 6))
-    plt.plot(fpr, tpr, marker='o', linestyle='-', color='b', label='ROC Curve')
+    plt.plot(fpr, tpr, marker='o', linestyle='-', color='orange', label='ROC Curve')
     plt.plot([0, 1], [0, 1], linestyle='--', color='gray', label='Random Classifier')
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
