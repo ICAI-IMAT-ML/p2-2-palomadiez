@@ -75,8 +75,9 @@ class knn:
         for sample in X:
             distances = self.compute_distances(sample)
             indices = self.get_k_nearest_neighbors(distances) 
-            label = self.most_common_label(indices)    
+            label = self.most_common_label(indices)  
             predicted.append(label)
+            
         
         return np.array(predicted)
 
@@ -101,7 +102,7 @@ class knn:
             indices = self.get_k_nearest_neighbors(distances)
             for i in indices:
                 cat = self.y_train[i]
-                if cat == 1:
+                if cat == "YES":
                     pos+=1
                 else:
                     neg+=1
