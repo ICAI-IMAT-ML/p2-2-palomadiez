@@ -439,33 +439,25 @@ def plot_roc_curve(y_true, y_probs, positive_label):
 
     """
     # TODO
-    # Convert y_true to binary (1 for positive_label, 0 otherwise)
-    y_true = np.array([1 if label == positive_label else 0 for label in y_true])
-    
-    # Sort by predicted probabilities in descending order
-    thresholds = np.sort(np.unique(y_probs))[::-1]
-    
-    tpr = []
-    fpr = []
+    thresholds = np.linspace(0, 1, 11)
+    fpr_values, tpr_values = [], []
     
     for threshold in thresholds:
         y_pred = (y_probs >= threshold).astype(int)
         
-        tp = np.sum((y_pred == 1) & (y_true == 1))
-        fp = np.sum((y_pred == 1) & (y_true == 0))
-        tn = np.sum((y_pred == 0) & (y_true == 0))
-        fn = np.sum((y_pred == 0) & (y_true == 1))
+        tp = np.sum((y_true == positive_label) & (y_pred == 1))
+        fp = np.sum((y_true != positive_label) & (y_pred == 1))
+        fn = np.sum((y_true == positive_label) & (y_pred == 0))
+        tn = np.sum((y_true != positive_label) & (y_pred == 0))
         
-        tpr.append(tp / (tp + fn) if (tp + fn) > 0 else 0)
-        fpr.append(fp / (fp + tn) if (fp + tn) > 0 else 0)
+        tpr = tp / (tp + fn) if (tp + fn) > 0 else 0
+        fpr = fp / (fp + tn) if (fp + tn) > 0 else 0
+        
+        tpr_values.append(tpr)
+        fpr_values.append(fpr)
     
-    # Append (0,0) and (1,1) to ensure proper curve
-    fpr = np.array([0] + fpr + [1])
-    tpr = np.array([0] + tpr + [1])
-    
-    # Plot ROC curve
-    plt.figure(figsize=(6, 6))
-    plt.plot(fpr, tpr, marker='o', linestyle='-', color='orange', label='ROC Curve')
+    plt.figure(figsize=(8, 6))
+    plt.plot(fpr_values, tpr_values, marker='o', linestyle='-', color='b', label='ROC Curve')
     plt.plot([0, 1], [0, 1], linestyle='--', color='gray', label='Random Classifier')
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
@@ -473,5 +465,5 @@ def plot_roc_curve(y_true, y_probs, positive_label):
     plt.legend()
     plt.grid()
     plt.show()
-  
-    return {"fpr": np.array(fpr), "tpr": np.array(tpr)}
+    
+    return {"fpr": np.array(fpr_values), "tpr": np.array(tpr_values)}
